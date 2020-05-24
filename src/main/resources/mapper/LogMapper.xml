@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--指定属性-->
+
+<mapper namespace="com.shop.dao.LogMapper">
+
+    <!--生成物流单号-->
+    <insert id="LogInsert" parameterType="log">
+INSERT INTO log
+(
+
+log.log_id,
+log.log_name,
+log.log_date,
+log.log_state,
+log.log,
+log_orderid
+)
+VALUES
+(
+#{log_id},
+#{log_name},
+#{log_date},
+#{log_state},
+#{log.log},
+#{log_orderid}
+)
+    </insert>
+
+    <!--更新物流-->
+    <update id="UpdateLog" parameterType="log">
+        update log
+        <set>
+            <if test="log_state!= null">
+                log_state=#{log_state},
+            </if>
+        </set>
+        where log_orderid=#{log_orderid}
+    </update>
+
+    <!--查询物流-->
+    <select id="SelectLog" resultType="log" parameterType="Integer">
+          SELECT
+*
+FROM
+log
+WHERE
+log_orderid=#{log_orderid}
+    </select>
+
+</mapper>
+

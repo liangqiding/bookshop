@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header"  th:content="${_csrf.headerName}"/>
+	<meta charset="UTF-8"></meta>
+	<title>Spring Boot Web开发测试</title>
+	<link rel="stylesheet" th:href="@{css/bootstrap.min.css}"/>
+	<link rel="stylesheet" th:href="@{css/bootstrap-theme.min.css}"/>
+
+
+		<title>订单详情</title>
+
+		<link th:href="@{AmazeUI-2.4.2/assets/css/admin.css}" rel="stylesheet" type="text/css">
+		<link th:href="@{AmazeUI-2.4.2/assets/css/amazeui.css}" rel="stylesheet" type="text/css">
+
+		<link th:href="@{css/personal.css}" rel="stylesheet" type="text/css">
+		<link th:href="@{css/orstyle.css}" rel="stylesheet" type="text/css">
+
+		<script th:href="@{AmazeUI-2.4.2/assets/js/jquery.min.js}"></script>
+		<script th:href="@{AmazeUI-2.4.2/assets/js/amazeui.js}"></script>
+	<script type="text/javascript" th:src="@{js/jquery-3.2.1.min.js}"></script>
+	<script type="text/javascript" th:src="@{js/bootstrap.min.js}"></script>
+	<script type="text/javascript">
+        $(document).ready(function(){
+            findBooks();
+        });
+        function findBooks() {
+//    crsf  token
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            $(document).ajaxSend(function (e, xhr, options) {
+                xhr.setRequestHeader(header, token);
+            });
+
+            $.ajax({
+                url: "/AjaxOrderP",
+                type: 'post',
+                success: function (data) {
+                   if(data==1){
+                       $("#p1").attr("class","active");
+				   }else if (data==2){
+                       $("#p2").attr("class","active");
+				   }else if (data==3){
+                       $("#p3").attr("class","active");
+                   }else if (data==4){
+                       $("#p4").attr("class","active");
+                   }else {
+                       $("#p0").attr("class","active");
+
+				   }
+                },
+                error: function () {
+                    alert("出错了！")
+                }
+            });
+
+
+
+        }
+
+        function yes() {
+            var r = confirm("确定收货吗？");
+            if (r == true) {
+//写入数据库中，对应ID扣掉5积分
+                alert("收货成功");//写上JS跳转信息，跳转到详细信息页面
+            }
+            else {
+                alert("取消收货");
+                return false;
+            }
+        }
+        </script>
+	<style>
+
+		.am-btn-blue {
+			color: #fff;
+			background-color: #58ddd5;
+			border-color: #58ddd5;
+		}
+		.am-btn-green {
+			color: #fff;
+			background-color:#3cdd79;
+			border-color: #3cdd79;
+		}
+		.am-btn-yellow {
+			color: #fff;
+			background-color: #ddd71c;
+			border-color: #ddd71c;
+		}
+
+	</style>
+
+	</head>
+
+	<body>
+		<!--头 -->
+		<header>
+			<article>
+				<div class="mt-logo">
+					<!--顶部导航条 -->
+					<div class="am-container header">
+						<ul class="message-l">
+
+						</ul>
+						<ul class="message-r">
+							<div class="topMessage home">
+								<div class="menu-hd"><a href="/index" target="_top" class="h">商城首页</a></div>
+							</div>
+							<div class="topMessage my-shangcheng">
+								<div class="menu-hd MyShangcheng"><a href="#" target="_top"><i class="am-icon-user am-icon-fw"></i>个人中心</a></div>
+							</div>
+							<div class="topMessage mini-cart">
+								<div class="menu-hd"><a id="mc-menu-hd" href="#" target="_top"><i class="am-icon-shopping-cart  am-icon-fw"></i><span>购物车</span><strong id="J_MiniCartNum" class="h">0</strong></a></div>
+							</div>
+							<div class="topMessage favorite">
+								<div class="menu-hd"><a href="#" target="_top"><i class="am-icon-heart am-icon-fw"></i><span>收藏夹</span></a></div>
+						</ul>
+						</div>
+
+						<!--悬浮搜索框-->
+
+						<div class="nav white">
+							<div class="logoBig">
+								<li><img src="images/logobig.png" /></li>
+							</div>
+
+							<div class="search-bar pr">
+								<a name="index_none_header_sysc" href="#"></a>
+								<form>
+									<input id="searchInput" name="index_none_header_sysc" type="text" placeholder="搜索" autocomplete="off">
+									<input id="ai-topsearch" class="submit am-btn" value="搜索" index="1" type="submit">
+								</form>
+							</div>
+						</div>
+
+						<div class="clear"></div>
+					</div>
+				</div>
+			</article>
+		</header>
+            <div class="nav-table">
+					   <div class="long-title"><span class="all-goods">全部分类</span></div>
+					   <div class="nav-cont">
+							<ul>
+								<li class="index"><a href="/index">首页</a></li>
+							</ul>
+						    <div class="nav-extra">
+						    	<i class="am-icon-user-secret am-icon-md nav-user"></i><b></b>我的福利
+						    	<i class="am-icon-angle-right" style="padding-left: 10px;"></i>
+						    </div>
+						</div>
+			</div>
+			<b class="line"></b>
+		<div class="center">
+			<div class="col-main">
+				<div class="main-wrap">
+
+					<div class="user-orderinfo">
+
+						<!--标题 -->
+						<div class="am-cf am-padding">
+							<div class="am-fl am-cf"><strong class="am-text-danger am-text-lg">订单详情</strong> / <small>Order&nbsp;details</small></div>
+						</div>
+						<hr/>
+						<!--进度条-->
+
+
+
+						<div class="order-infomain">
+
+							<div class="order-top">
+								<div class="th th-item">
+									<td class="td-inner">商品</td>
+								</div>
+								<div class="th th-price">
+									<td class="td-inner">单价</td>
+								</div>
+								<div class="th th-number">
+									<td class="td-inner">数量</td>
+								</div>
+								<div class="th th-operation">
+									<td class="td-inner">商品操作</td>
+								</div>
+								<div class="th th-amount">
+									<td class="td-inner">合计</td>
+								</div>
+								<div class="th th-status">
+									<td class="td-inner">交易状态</td>
+								</div>
+								<div class="th th-change">
+									<td class="td-inner">交易操作</td>
+								</div>
+							</div>
+
+							<div class="order-main">
+
+<!--订单-->
+								<div class="order-status3" th:each="order:${order}">
+									<div class="order-title">
+										<div class="dd-num">订单编号：<a href="javascript:;" th:text="${order.order_id}"></a></div>
+										<span th:text="'成交时间：'+${order.date}"></span>
+										<!--    <em>店铺：小桔灯</em>-->
+									</div>
+									<div class="order-content">
+										<div class="order-left">
+
+
+<!--物品详情-->
+											<ul class="item-list" th:each="cart:${order.CartList}">
+												<li class="td td-item">
+													<div class="item-pic">
+														<a href="#" class="J_MakePoint">
+															<img th:src="'img/'+${cart.cart_imgfile}" class="itempic J_ItemImg">
+														</a>
+													</div>
+													<div class="item-info">
+														<div class="item-basic-info">
+															<a href="#">
+																<p th:text="'商品名：'+${cart.cart_book_name}" ></p>
+																<p class="info-little">套餐1
+																	<br/>包装：裸装 </p>
+															</a>
+														</div>
+													</div>
+												</li>
+												<li class="td td-price">
+													<!--单价-->
+													<div class="item-price" th:text="${#numbers.formatDecimal(cart.cart_one_price*0.9,1,2)}">
+
+													</div>
+												</li>
+												<li class="td td-number">
+													<div class="item-number">
+														<span th:text="'×'+${cart.cart_sum}"></span>
+													</div>
+												</li>
+												<li class="td td-operation">
+													<div class="item-operation">
+														<a>退款/退货</a><br>
+														<a th:href="'/wuliu?order_id='+${cart.cart_order_id}">查看物流</a>
+													</div>
+												</li>
+											</ul>
+
+
+
+
+
+										</div>
+										<div class="order-right">
+											<li class="td td-amount">
+												<div class="item-amount" th:text="'合计：'+${order.order_price}">
+
+													<p>含运费：<span>10.00</span></p>
+												</div>
+											</li>
+											<div class="move-right">
+												<li class="td td-status">
+													<div class="item-status">
+														<p class="Mystatus" th:text="${order.state}"></p>
+
+
+													</div>
+												</li>
+												<li class="td td-change">
+													<div th:if="${order.state}=='待收货'">
+													<div class="am-btn am-btn-blue anniu">
+														<a onclick="return yes()" th:href="'/personalorder?order_id='+${order.order_id}">确认收货</a>
+													</div>
+													</div>
+													<div th:if="${order.state}=='交易成功'">
+														<div class="am-btn am-btn-yellow anniu">
+															<a >售后服务</a>
+														</div>
+													</div>
+													<div th:if="${order.state}=='交易失败'">
+														<div class="am-btn am-btn-danger anniu">
+															<a >交易失败</a>
+														</div>
+													</div>
+													<div th:if="${order.state}=='待发货'">
+														<div class="am-btn am-btn-blue anniu">
+															<a >待发货</a>
+														</div>
+													</div>
+
+												</li>
+											</div>
+										</div>
+									</div>
+
+								</div>
+
+
+
+
+
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+
+
+
+				<!--底部-->
+				<div class="footer">
+					<div class="footer-hd">
+						<p>
+
+
+							<a href="/index">商城首页</a>
+							<b>|</b>
+							<a href="#">支付宝</a>
+							<b>|</b>
+							<a href="#">物流</a>
+						</p>
+					</div>
+					<div class="footer-bd">
+						<p>
+
+							<a href="#">合作伙伴</a>
+							<a href="#">联系我们</a>
+							<a href="#">网站地图</a>
+							<em>©  版权所有</em>
+						</p>
+					</div>
+				</div>
+
+			</div>
+			<aside class="menu">
+				<ul>
+					<li class="person">
+						<a href="/personal">个人中心</a>
+					</li>
+
+					<li class="person">
+						<a href="/personalorder">订单管理</a>
+						<ul>
+							<li id="p0"><a href="/personalorder">全部订单</a></li>
+							<li id="p1"><a href="/personalorder?state=1">待发货</a></li>
+							<li id="p2"><a href="/personalorder?state=2">待收货</a></li>
+							<li id="p3"><a href="/personalorder?state=3">交易成功</a></li>
+							<li id="p4"><a href="/personalorder?state=4">退换货</a></li>
+						</ul>
+					</li>
+
+
+					<li class="person">
+						<a href="#">我的小窝</a>
+						<ul>
+							<li> <a href="#">收藏</a></li>
+							<li> <a href="#">足迹</a></li>
+							<li> <a href="#">评价</a></li>
+							<li> <a href="#">消息</a></li>
+						</ul>
+					</li>
+
+				</ul>
+
+			</aside>
+		</div>
+
+	</body>
+
+</html>

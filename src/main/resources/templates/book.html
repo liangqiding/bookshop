@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header"  th:content="${_csrf.headerName}"/>
+<head>
+<meta charset="UTF-8"></meta>
+<title>图书商城系统开发测试</title>
+<link rel="stylesheet" th:href="@{css/bootstrap.min.css}" />
+<link rel="stylesheet" th:href="@{css/bootstrap-theme.min.css}"/> 
+<script type="text/javascript" th:src="@{js/jquery-3.2.1.min.js}"></script>
+<script type="text/javascript" th:src="@{js/bootstrap.min.js}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	findBooks();
+});
+function findBooks(){
+//    crsf  token
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+    $(document).ajaxSend(function(e, xhr, options) {
+        xhr.setRequestHeader(header, token);
+    });
+
+    $.ajax({
+        url: "Book",
+        type: 'post',
+
+        dataType:'json',
+        success: function(data){
+            $.each(data,function(){
+                var tr  = $("<tr/>");
+                $("<img/>").attr("src","img/"+this.imgfile).attr("height",60).appendTo("<td/>").appendTo(tr);
+                $("<td/>").html(this.name).appendTo(tr);
+                $("<td/>").html(this.dict_class).appendTo(tr);
+
+
+                $("<td/>").html(this.zuozhe).appendTo(tr);
+                $("<td/>").html(this.price).appendTo(tr);
+                $("<td/>").html(this.keep).appendTo(tr);
+                $("<td/>").html(this.book_out).appendTo(tr);
+
+
+                $("<a/>").html("修改").attr("class","btn btn-default btn-sm").attr("role","button").attr("href","/update?id="+this.bookid).appendTo("<td/>").appendTo(tr);
+
+                $("<a/>").html("删除").attr("class","btn btn-default btn-sm").attr("role","button").attr("onclick","return del()").attr("href","delete?id="+this.bookid).appendTo("<td/>").appendTo(tr);
+
+                $("#booktable").append(tr);
+            })
+        },
+        error : function() {
+            alert("出错了！")
+		}
+    });
+    $.ajax({
+        url: "/UpdateBooks",
+        type: 'post',
+
+        success: function (data) {
+            if (data=="1"){alert("修改成功了")}else if (data=="2"){alert("修改失败了！")}
+		},
+        error:function () {
+            alert("更新页面出错了！")
+        }
+    });
+
+}
+
+$(function () {
+    $("#submitbtns").click(function () {
+        var name=$("#name");
+        var price=$("#price");
+        var keep=$("#keep");
+        var zuozhe=$("#zuozhe");
+		if (name.val()==""){
+            alert("名称不能为空");
+            name.focus();
+            return false;
+		}else if (keep.val()==""){
+            alert("名称不能为空");
+            keep.focus();
+            return false;
+        }else if (zuozhe.val()==""){
+            alert("名称不能为空");
+            zuozhe.focus();
+            return false;
+        }else if (price.val()==""){
+            alert("名称不能为空");
+            price.focus();
+            return false;
+        }else {
+            $("#update").submit();
+		}
+    })
+})
+
+
+function del(){
+    var r=confirm("确定删除吗？");
+    if(r==true)
+    {
+//写入数据库中，对应ID扣掉5积分
+        alert("删除成功");//写上JS跳转信息，跳转到详细信息页面
+    }
+    else
+    {
+        alert("取消删除");
+        return false;
+    }
+}
+
+
+</script>
+	<style>
+		.divs{
+
+			margin-left: 30%;
+		}
+		.right{
+			margin-left: 85%;
+		}
+	</style>
+</head>
+<body background="../img/bg2.jpg">
+
+<!--标题-->
+<!-- ********************************************** 页眉标题 ***************************************************-->
+<div class="container-fluid">
+	<div class="row"  >
+		<h1 class="text-center" >图书商城系统卖家中心</h1>
+
+	</div>
+</div>
+
+<!--*******************************-->
+
+<!--导航条-->
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="/index">商城首页</a>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<!--/order-->
+				<li ><a href="/usermanage">用户管理 </a></li>i
+				<li ><a href="/order">订单管理 </a></li>
+
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">分类查询 <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="/selectclass?book_class=22">IT教育</a></li>
+						<li><a href="/selectclass?book_class=1">马克思主义</a></li>
+						<li><a href="/selectclass?book_class=2">哲学</a></li>
+						<li><a href="/selectclass?book_class=3">社会科学总论</a></li>
+                        <li><a href="/selectclass?book_class=4">政治</a></li>
+                        <li><a href="/selectclass?book_class=5">军事</a></li>
+						<li><a href="/selectclass?book_class=7">文化、科学、教育、体育</a></li>
+						<li><a href="/selectclass?book_class=9">文学</a></li>
+						<li><a href="/selectclass?book_class=13">数理科学和化学</a></li>
+						<li><a href="/selectclass?book_class=23">外语</a></li>
+					</ul>
+				</li>
+			</ul>
+			<form action="/selectbook" class="navbar-form navbar-left" role="search">
+				<div class="form-group">
+					<input type="text" name="name" class="form-control" placeholder="书名">
+				</div>
+				<button type="submit" class="btn btn-default">查询</button>
+			</form>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="#">用户状态</a></li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">在线<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="#">用户名：<span th:text="${session.user}"></span></a></li>
+						<li><a href="#">权限:<span th:text="${session.role}"></span></a></li>
+						<li><a href="#">消息:无</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="/logout">退出登陆</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</div><!-- /.container-fluid -->
+</nav>
+
+
+
+<!--*************************************************-->
+
+<!-- 添加Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel">添加图书</h4>
+			</div>
+			<div class="modal-body">
+				<form  th:action="@{/update}" enctype="multipart/form-data" method="post" id="update">
+
+
+					<input class="form-control" placeholder="书名" type="text" name="name" id="name"/>
+					<br/><input class="form-control" placeholder="价格" type="text" name="price" id="price" />
+					<br/><input class="form-control" placeholder="添加数量" type="text" name="keep" id="keep"/>
+					<br/>图书种类：<br/>
+					<select name="book_class">
+						<option value="22">IT教育</option>
+						<option value="1">马克思主义</option>
+						<option value="2">哲学</option>
+					    <option value="3">社会科学总论</option>
+						<option value="4">军事</option>
+						<option value="5">经济</option>
+						<option value="7">文化、科学、教育、体育</option>
+						<option value="9">文学</option>
+						<option value="10">艺术</option>
+						<option value="13">数理科学和化学</option>
+						<option value="15">生物科学</option>
+						<option value="16">医药、卫生</option>
+						<option value="23">外语</option>
+						<option value="21">其它</option>
+					</select>
+					<br/>
+					<!--借阅状态：<br/>-->
+					<!--<select name="state">-->
+						<!--<option value="可借阅">可借阅</option>-->
+						<!--<option value="不可借阅">不可借阅</option>-->
+					<!--</select>-->
+					<br/><input  class="form-control" placeholder="作者" type="text" name="zuozhe" id="zuozhe"/>
+
+
+
+					<br/><input  placeholder="请选择图书封面" type="file" name="file" id="file"/>
+
+
+
+					<br/><button type="submit" class="btn btn-success" id="submitbtns">
+					&nbsp;添加图书</button>
+
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" >检测</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 修改Modal -->
+<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel">修改图书信息</h4>
+			</div>
+			<div class="modal-body">
+				<form  th:action="@{/upload}" enctype="multipart/form-data" method="post">
+
+
+					<input class="form-control" placeholder="书名" type="text" name="name" />
+					<br/><input class="form-control" placeholder="价格" type="text" name="price" />
+					<br/><input class="form-control" placeholder="库存" type="text" name="keep" />
+					<br/><input  class="form-control" placeholder="作者" type="text" name="zuozhe" />
+					<br/>图书种类：<br/>
+					<select name="book_class">
+						<option value="22">IT教育</option>
+						<option value="1">马克思主义</option>
+						<option value="2">哲学</option>
+						<option value="3">社会科学总论</option>
+						<option value="4">军事</option>
+						<option value="5">经济</option>
+						<option value="7">文化、科学、教育、体育</option>
+						<option value="9">文学</option>
+						<option value="10">艺术</option>
+						<option value="13">数理科学和化学</option>
+						<option value="15">生物科学</option>
+						<option value="16">医药、卫生</option>
+						<option value="23">外语</option>
+						<option value="21">其它</option>
+					</select>
+					<br/>
+					<!--借阅状态：<br/>-->
+					<!--<select name="state">-->
+						<!--<option value="可借阅">可借阅</option>-->
+						<!--<option value="不可借阅">不可借阅</option>-->
+					<!--</select>-->
+
+
+					<br/><input  placeholder="请选择图书封面" type="file" name="file" />
+
+
+
+					<br/><button type="submit" class="btn btn-success" id="submitbtn">
+					&nbsp;确定修改</button>
+
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" >检测</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!--****************************-->
+
+
+	<!--<div class="panel panel-primary">-->
+		<!--<div class="panel-heading">-->
+			<!--<h3 class="panel-title">Spring Boot中集合转换JSON</h3>-->
+		<!--</div>-->
+	<!--</div>-->
+	<!-- .container 类用于固定宽度并支持响应式布局的容器。 -->
+
+	<div class="container-fluid">
+		<div class="col-md-12">
+			<div class="panel panel-primary">
+				<!-- .panel-heading 面板头信息。 -->		
+				<div class="panel-heading">
+					<!-- .panel-title 面板标题。 -->		
+
+					<button type="button" class="btn btn-default"  data-toggle="modal" data-target="#myModal">
+						<span class="glyphicon glyphicon-edit"></span>添加
+					</button>
+
+					<a href="/return" class="btn btn-default right" role="button">点击返回</a>
+
+			  </div>
+			  <div class="panel-body">
+				<!-- table-responsive:响应式表格,在一个表展示所有的数据,当不够显示的时候可以左右滑动浏览-->
+				<div class="table table-responsive">
+					<!--
+						 .table 类可以为其赋予基本的样式 — 少量的内补（padding）和水平方向的分隔线。
+	                	.table-bordered 类为表格和其中的每个单元格增加边框。
+	                	.table-hover 类可以让 <tbody> 中的每一行对鼠标悬停状态作出响应。
+	                -->
+					<table class="table table-bordered table-hover" id="booktable">
+						<thead>
+							<tr>
+								
+								<th class="text-center">封面</th >
+								<th class="text-center">书名</th>
+								<th class="text-center">类别</th >
+
+
+								<th class="text-center">作者</th >
+								<th class="text-center">价格</th >
+								<th class="text-center">库存</th >
+								<th class="text-center">销量</th >
+
+								<th class="text-center">商品管理</th >
+
+							</tr>
+						</thead>
+						<tbody class="text-center">
+
+						</tbody>
+					</table>
+
+
+				</div>
+
+			</div>
+
+				<!--分页-->
+				<div class="divs">
+					<nav>
+						<ul class="pagination">
+							<li><a href="/page?star=1">起始页</a></li>
+							<li>
+								<a href="/page?num=1" aria-label="Previous">
+									<span aria-hidden="true">&laquo;上一页</span>
+								</a>
+							</li>
+							<!--<li ><a  href="#">1</a></li>-->
+							<!--<li><a href="#">2</a></li>-->
+							<li th:class="${class}"><a href="#" th:text="${Pagenum}"></a></li>
+							<!--<li><a href="#">4</a></li>-->
+							<!--<li><a href="#">5</a></li>-->
+							<li>
+								<a href="/page" aria-label="Next">
+									<span aria-hidden="true">下一页&raquo;</span>
+								</a>
+							</li>
+							<li><a href="/page?Pages=1" >末页</a></li>
+
+
+						</ul>
+
+					</nav>
+
+				</div>
+				<!--分页-->
+
+			</div>
+		</div>
+
+	</div>
+
+
+
+
+</body>
+</html>

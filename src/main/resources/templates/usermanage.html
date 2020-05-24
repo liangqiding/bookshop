@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+<meta charset="UTF-8"></meta>
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header"  th:content="${_csrf.headerName}"/>
+<title>图书管理系统开发测试</title>
+<link rel="stylesheet" th:href="@{css/bootstrap.min.css}" />
+<link rel="stylesheet" th:href="@{css/bootstrap-theme.min.css}"/> 
+<script type="text/javascript" th:src="@{js/jquery-3.2.1.min.js}"></script>
+<script type="text/javascript" th:src="@{js/bootstrap.min.js}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	findBooks();
+});
+function findBooks(){
+    //    crsf  token
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+    $(document).ajaxSend(function(e, xhr, options) {
+        xhr.setRequestHeader(header, token);
+    });
+
+    $.ajax({
+        url: "/User",
+        type: 'post',
+        dataType:'json',
+        success: function(data){
+
+		$.each(data,function(){
+			var tr  = $("<tr/>");
+
+			$("<td/>").html(this.name).appendTo(tr);
+            $("<td/>").html(this.card_id).appendTo(tr);
+            $("<td/>").html(this.credit).appendTo(tr);
+            $("<td/>").html(this.sum).appendTo(tr);
+            $("<td/>").html(this.age).appendTo(tr);
+            $("<td/>").html(this.sex).appendTo(tr);
+            $("<td/>").html(this.phone).appendTo(tr);
+            $("<td/>").html(this.address).appendTo(tr);
+            $("<td/>").html(this.email).appendTo(tr);
+            $("<td/>").html(this.card_date).appendTo(tr);
+            $("<td/>").html(this.authority).appendTo(tr);
+
+$("<a/>").html("修改").attr("class","btn btn-default btn-sm").attr("role","button").attr("href","update?id=").appendTo("<td/>").appendTo(tr);
+
+            $("#usertable").append(tr);
+        })
+        },
+        error : function() {
+            alert("出错了！")
+        }
+    });
+
+}
+
+function del(){
+    var r=confirm("确定删除吗？");
+    if(r==true)
+    {
+//写入数据库中，对应ID扣掉5积分
+        alert("删除成功");//写上JS跳转信息，跳转到详细信息页面
+    }
+    else
+    {
+        alert("取消删除");
+        return false;
+    }
+}
+
+
+</script>
+	<style>
+		.divs{
+
+			margin-left: 30%;
+		}
+		.right{
+			margin-left: 85%;
+		}
+	</style>
+</head>
+<body background="../img/bg2.jpg">
+
+<!--标题-->
+<!-- ********************************************** 页眉标题 ***************************************************-->
+<div class="container-fluid">
+	<div class="row"  >
+		<h1 class="text-center" >用户管理</h1>
+
+	</div>
+</div>
+
+<!--*******************************-->
+
+<!--导航条-->
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">首页</a>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="#">用户状态</a></li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">在线<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="/logout">退出登陆</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</div><!-- /.container-fluid -->
+</nav>
+
+
+
+<!--*************************************************-->
+<!--****************************-->
+
+
+	<!--<div class="panel panel-primary">-->
+		<!--<div class="panel-heading">-->
+			<!--<h3 class="panel-title">Spring Boot中集合转换JSON</h3>-->
+		<!--</div>-->
+	<!--</div>-->
+	<!-- .container 类用于固定宽度并支持响应式布局的容器。 -->
+
+	<div class="container">
+		<div class="col-md-12">
+			<div class="panel panel-primary">
+				<!-- .panel-heading 面板头信息。 -->		
+				<div class="panel-heading">
+					<!-- .panel-title 面板标题。 -->
+
+					<a href="/return" class="btn btn-default right" role="button">返回</a>
+
+			  </div>
+			  <div class="panel-body">
+				<!-- table-responsive:响应式表格,在一个表展示所有的数据,当不够显示的时候可以左右滑动浏览-->
+				<div class="table table-responsive">
+					<!--
+						 .table 类可以为其赋予基本的样式 — 少量的内补（padding）和水平方向的分隔线。
+	                	.table-bordered 类为表格和其中的每个单元格增加边框。
+	                	.table-hover 类可以让 <tbody> 中的每一行对鼠标悬停状态作出响应。
+	                -->
+					<table class="table table-bordered table-hover" id="usertable">
+						<thead>
+							<tr>
+								<th class="text-center">用户名</th >
+								<th class="text-center">借阅卡号</th>
+								<th class="text-center">信用状态</th>
+								<th class="text-center">借阅数量</th>
+								<th class="text-center">年龄</th >
+								<th class="text-center">性别</th >
+								<th class="text-center">手机</th >
+								<th class="text-center">地址</th >
+								<th class="text-center">Email</th >
+								<th class="text-center">建卡时间</th >
+								<th class="text-center">权限</th >
+								<th class="text-center">管理</th >
+							</tr>
+						</thead>
+						<tbody class="text-center">
+
+						</tbody>
+					</table>
+
+
+				</div>
+
+			</div>
+
+				<!--分页-->
+				<div class="divs">
+					<nav>
+						<ul class="pagination">
+							<li><a href="/page?star=1">起始页</a></li>
+							<li>
+								<a href="/page?num=1" aria-label="Previous">
+									<span aria-hidden="true">&laquo;上一页</span>
+								</a>
+							</li>
+							<!--<li ><a  href="#">1</a></li>-->
+							<!--<li><a href="#">2</a></li>-->
+							<li th:class="${class}"><a href="#" th:text="${Pagenum}"></a></li>
+							<!--<li><a href="#">4</a></li>-->
+							<!--<li><a href="#">5</a></li>-->
+							<li>
+								<a href="/page" aria-label="Next">
+									<span aria-hidden="true">下一页&raquo;</span>
+								</a>
+							</li>
+							<li><a href="/page?Pages=1" >末页</a></li>
+
+
+						</ul>
+
+					</nav>
+
+				</div>
+				<!--分页-->
+
+			</div>
+		</div>
+
+	</div>
+
+
+
+
+</body>
+</html>

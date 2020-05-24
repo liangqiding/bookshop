@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--指定属性-->
+
+<mapper namespace="com.shop.dao.OrderMapper">
+    <!--借阅-->
+    <insert id="BorrowInsert" parameterType="order">
+
+        INSERT INTO book_order
+(
+book_order.order_name,
+book_order.address,
+book_order.phone,
+book_order.date,
+book_order.book_id,
+book_order.order_id,
+order_price,
+returndate,
+longtime,
+order_cardid,
+post,
+state,
+sum
+)
+VALUES
+(
+#{order_name},
+#{address},
+#{phone},
+#{date},
+#{book_id},
+#{order_id},
+#{order_price},
+#{returndate},
+#{longtime},
+#{order_cardid},
+#{post},
+'待发货',
+#{sum}
+)
+
+    </insert>
+
+<!--state 1. 待发货 2.待收货 3.交易成功 4.交易关闭-->
+    <!--根据用户信息卡查询订单-->
+    <select id="SelectOrderAllById" parameterType="order" resultType="order">
+       SELECT
+book_order.id,
+book_order.order_name,
+book_order.address,
+book_order.phone,
+book_order.date,
+book_order.book_id,
+book_order.order_id,
+book_order.order_price,
+book_order.returndate,
+book_order.longtime,
+book_order.state,
+book.name,
+post,
+book.price,
+order_cardid,
+sum,
+imgfile
+
+FROM
+book_order
+LEFT JOIN book
+ON
+bookid=book_id
+<where>
+
+    <if test="order_cardid!=null and order_cardid!=''">
+       and order_cardid=#{order_cardid}
+    </if>
+    <if test="state!=null and state!=''">
+        and book_order.state=#{state}
+    </if>
+</where>
+    </select>
+
+
+    <!--更新订单-->
+    <update id="UpdateOrder" parameterType="order">
+        update book_order
+        <set>
+            <if test="state!= null">
+                state=#{state},
+            </if>
+        </set>
+        where order_id=#{order_id}
+    </update>
+
+    <!--查询所有订单-->
+    <select id="SelectAllOrder" resultType="order" parameterType="order">
+          SELECT
+book_order.id,
+book_order.order_name,
+book_order.address,
+book_order.phone,
+book_order.date,
+book_order.book_id,
+book_order.order_id,
+book_order.order_price,
+book_order.returndate,
+book_order.longtime,
+book_order.state,
+book.name,
+post,
+book.price,
+order_cardid,
+sum,
+imgfile
+
+FROM
+book_order
+LEFT JOIN book
+ON
+bookid=book_id
+<where>
+    <if test="state!=null and state!=''">
+        book_order.state=#{state}
+    </if>
+</where>
+    </select>
+
+    <!--查询订单-->
+<select id="SelectOrderByOrderID" parameterType="Integer" resultType="order">
+     SELECT *
+FROM
+book_order
+WHERE order_id=#{order_id}
+</select>
+
+
+
+<resultMap id="bycart" type="order">
+    <id property="id" column="id" />
+    <result property="book_name" column="book_name" />
+    <result property="order_name" column="order_name" />
+    <result property="address" column="address" />
+    <result property="phone" column="phone" />
+    <result property="date" column="date" />
+    <result property="book_id" column="book_id" />
+    <result property="order_id" column="order_id" />
+    <result property="state" column="state" />
+
+    <!--总价order_price-->
+    <result property="order_price" column="order_price" />
+    <result property="order_cardid" column="order_cardid" />
+    <result property="sum" column="sum" />
+
+    <collection property="CartList" javaType="list" ofType="cart">
+        <!-- 配置主键，是关联Order的唯一标识 -->
+        <id property="cart_id" column="cart_id" />
+        <result property="cart_order_id" column="cart_order_id" />
+        <result property="cart_date" column="cart_date" />
+        <result property="cart_state" column="cart_state" />
+        <result property="cart_book_name" column="cart_book_name" />
+        <result property="cart_book_id" column="cart_book_id" />
+        <result property="cart_book_order_price" column="cart_book_order_price" />
+        <result property="cart_sum" column="cart_sum" />
+        <result property="cart_imgfile" column="cart_imgfile" />
+        <result property="cart_cardid" column="cart_cardid" />
+
+        <result property="cart_one_price" column="cart_one_price" />
+    </collection>
+
+
+</resultMap>
+    <!--查询所有订单-->
+    <select id="SelectOrderAndCart" resultMap="bycart" parameterType="order">
+        SELECT
+        *
+
+        FROM
+        book_order LEFT JOIN
+cart_order ON order_id=cart_order.cart_order_id
+<where>
+    <if test="order_cardid !=null and order_cardid!=''">
+        order_cardid=#{order_cardid}
+    </if>
+    <if test="state !=null and state!=''">
+        state=#{state}
+    </if>
+</where>
+
+    </select>
+
+
+</mapper>
+

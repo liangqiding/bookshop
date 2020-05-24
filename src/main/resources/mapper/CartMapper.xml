@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--指定属性-->
+
+<mapper namespace="com.shop.dao.CartMapper">
+
+    <!--生成物流单号-->
+    <insert id="CartInserts" parameterType="cart">
+INSERT INTO cart_order
+(
+
+cart_order.cart_book_name,
+cart_order.cart_date,
+cart_order.cart_book_id,
+cart_order.cart_book_order_price,
+cart_order.cart_state,
+cart_order.cart_order_id,
+cart_order.cart_sum,
+cart_order.cart_imgfile,
+cart_cardid,
+cart_one_price
+
+
+)VALUES
+(
+#{cart_book_name},
+#{cart_date},
+#{cart_book_id},
+#{cart_book_order_price},
+#{cart_state},
+#{cart_order_id},
+#{cart_sum},
+#{cart_imgfile},
+#{cart_cardid},
+#{cart_one_price}
+
+)
+
+    </insert>
+
+
+    <!--更新子订单-->
+    <update id="UpdateCarts" parameterType="cart">
+        update cart_order
+        <set>
+            <if test="cart_sum!= null">
+                cart_sum=#{cart_sum},
+            </if>
+            <if test="cart_book_order_price!= null">
+                cart_book_order_price=#{cart_book_order_price},
+            </if>
+
+            <if test="cart_state!= null">
+                cart_state=#{cart_state},
+            </if>
+            <if test="cart_order_id!= null">
+                cart_order_id=#{cart_order_id},
+            </if>
+        </set>
+       <where>
+           (cart_state='待结算' or cart_state='购物车')
+           <if test="cart_id!=null">
+                 and cart_id=#{cart_id}
+           </if>
+           <if test="cart_cardid!=null">
+               and cart_cardid=#{cart_cardid}
+           </if>
+
+       </where>
+    </update>
+
+    <!--更新子订单  2-->
+    <update id="UpdateCartsPay" parameterType="cart">
+        update cart_order
+        <set>
+            <if test="cart_sum!= null">
+                cart_sum=#{cart_sum},
+            </if>
+            <if test="cart_book_order_price!= null">
+                cart_book_order_price=#{cart_book_order_price},
+            </if>
+
+            <if test="cart_state!= null">
+                cart_state=#{cart_state},
+            </if>
+            <if test="cart_order_id!= null">
+                cart_order_id=#{cart_order_id},
+            </if>
+        </set>
+        <where>
+
+                 cart_state='待结算'
+
+            <if test="cart_cardid!=null">
+                and cart_cardid=#{cart_cardid}
+            </if>
+        </where>
+    </update>
+
+
+    <select id="SelectAllCart" resultType="cart" parameterType="cart">
+    SELECT
+*
+FROM
+cart_order
+WHERE cart_cardid=#{cart_cardid}
+and (cart_state='待结算' OR cart_state='购物车')
+    </select>
+
+    <select id="SelectAllCartByState" resultType="cart" parameterType="Integer">
+        SELECT
+        *
+        FROM
+        cart_order
+        WHERE cart_cardid=#{cart_cardid}
+        and cart_state='待结算'
+    </select>
+    <select id="SelectCartById" resultType="cart" parameterType="cart">
+        SELECT
+        *
+        FROM
+        cart_order
+        WHERE cart_id=#{cart_id}
+        and (cart_state='待结算' or cart_state='购物车')
+    </select>
+
+
+</mapper>
+

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+<meta charset="UTF-8"></meta>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header"  th:content="${_csrf.headerName}"/>
+
+
+    <link rel="stylesheet" th:href="@{css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{css/bootstrap-theme.min.css}"/>
+    <script type="text/javascript" th:src="@{js/jquery-3.2.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{js/bootstrap.min.js}"></script>
+
+   <script type="text/javascript">
+       $(document).ready(function () {
+          select1();
+       });
+       function Updatebook() {
+           //    crsf  token
+           var token = $("meta[name='_csrf']").attr("content");
+           var header = $("meta[name='_csrf_header']").attr("content");
+           $(document).ajaxSend(function(e, xhr, options) {
+               xhr.setRequestHeader(header, token);
+           });
+
+       }
+   </script>
+
+<title>修改图书信息</title>
+</head>
+<body>
+
+<style>
+    .b{
+
+        margin-top: 50px;
+        margin-bottom: 150px;
+        margin-left: 550px;
+        margin-right: 250px;
+
+    }
+    .span{
+        color: red;
+        font-size: large;
+    }
+    .spans{
+        color: blue;
+        font-size: large;
+    }
+    .right{
+        margin-left: 85%;
+    }
+</style>
+
+    
+
+<!--标题-->
+<!-- ********************************************** 页眉标题 ***************************************************-->
+<div class="container-fluid">
+    <div class="row"  >
+        <h1 class="text-center" >请输入新的图书信息</h1>
+    </div>
+</div>
+
+
+
+<!--*******************************-->
+<div class="container-fluid">
+    <!--  -->
+    <div class="row">
+
+        <div class="col-md-1">
+        </div>
+
+        <div class="col-md-10">
+            <div class="page-header">
+                <h3><p>图书名：<span th:text="${bookname}" class="span"></span></p></h3>
+
+
+
+                 <form  class="form-horizontal" th:action="@{/updatemain}" enctype="multipart/form-data" method="post">
+
+
+    书名：<input class="form-control"  th:placeholder="${bookname}" type="text" name="name" />
+    <br/>价格：<input class="form-control" th:placeholder="${bookprice}" type="text" name="price" />
+    <br/>库存：<input class="form-control" th:placeholder="${bookkeep}" type="text" name="keep" />
+    <br/>作者：<input  class="form-control" th:placeholder="${bookzuozhe}" type="text" name="zuozhe" />
+
+                     <br/>图书种类：<br/>
+                     <select name="book_class" id="book_class">
+                         <option value="22" th:selected="${s22}">IT教育</option>
+                         <option value="1" th:selected="${s1}">马克思主义</option>
+                         <option value="2" th:selected="${s2}">哲学</option>
+                         <option value="3" th:selected="${s3}">社会科学总论</option>
+                         <option value="4" th:selected="${s4}">政治</option>
+                         <option value="5" th:selected="${s5}">军事</option>
+                         <option value="7" th:selected="${s7}">文化、科学、教育、体育</option>
+                         <option value="9" th:selected="${s9}">文学</option>
+                         <option value="10" th:selected="${s10}">艺术</option>
+                         <option value="13" th:selected="${s13}">数理科学和化学</option>
+                         <option value="15" th:selected="${s15}">生物科学</option>
+                         <option value="16" th:selected="${s16}">医药、卫生</option>
+                         <option value="23" th:selected="${s23}">外语</option>
+                         <option value="21"  th:selected="${s21}">其它</option>
+                     </select>
+                     <br/>
+                     <!--借阅状态：<br/>-->
+                     <!--<select name="state">-->
+                         <!--<option value="可借阅" th:selected="${state1}">可借阅</option>-->
+                         <!--<option value="不可借阅" th:selected="${state2}">不可借阅</option>-->
+                     <!--</select>-->
+
+                     <!--<br/>已经借阅：<input  class="form-control" th:placeholder="${book_out}" type="text" name="book_out" />-->
+                     <br>
+                     请选择图书封面：
+                     <br>
+    <br/><input  placeholder="请选择图书封面" type="file" name="file" />
+
+
+
+    <br/><button type="submit" class="btn btn-success" id="submitbtn" onclick="Updatebook()">
+    &nbsp;确定修改</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                     <a href="/return" class="btn btn-default " role="button">返回</a>
+
+</form>
+          </div>
+       </div>
+</div>
+</div>
+
+
+</body>
+</html>

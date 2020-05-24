@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+<meta charset="UTF-8"></meta>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header"  th:content="${_csrf.headerName}"/>
+
+    <link rel="stylesheet" th:href="@{css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{css/bootstrap-theme.min.css}"/>
+    <script type="text/javascript" th:src="@{js/jquery-3.2.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{js/bootstrap.min.js}"></script>
+
+<title>修改图书信息</title>
+</head>
+<body>
+<style>
+    .b{
+
+        margin-top: 50px;
+        margin-bottom: 150px;
+        margin-left: 550px;
+        margin-right: 250px;
+
+    }
+    .span{
+        color: red;
+        font-size: large;
+    }
+    .spans{
+        color: blue;
+        font-size: large;
+    }
+    .right{
+        margin-left: 85%;
+    }
+</style>
+<script>
+    $(document).ready(function(){
+        $(".s").hide();
+
+        $("#selectclass").change(function(){
+            var hideselect = $(this).val();
+            if(hideselect == 2){
+                $(".s").show();
+            }else {
+                $(".s").hide();
+            }
+        });
+
+    });
+</script>
+
+<!--标题-->
+<!-- ********************************************** 页眉标题 ***************************************************-->
+<div class="container-fluid">
+    <div class="row"  >
+        <h1 class="text-center" >借阅图书</h1>
+    </div>
+</div>
+
+
+
+<!--*******************************-->
+<div class="container-fluid">
+    <!--  -->
+    <div class="row">
+
+        <div class="col-md-3">
+        </div>
+
+        <div class="col-md-5">
+            <div class="page-header">
+                <h3><p>借阅证办理</p></h3>
+
+
+
+                 <form  class="form-horizontal" th:action="@{/BcardMain}" enctype="multipart/form-data" method="post">
+
+                     <br/>
+                     <input class="form-control "  placeholder="姓名" type="text" name="name" />
+                     <br/>
+                     <label><input name="sex" type="radio" value="男" />男 </label>
+                     <label><input name="sex" type="radio" value="女" />女 </label>
+                     <br/>
+                     <input class="form-control "  placeholder="年龄" type="text" name="age" />
+                     <br/>
+                     <input class="form-control "  placeholder="身份证号" type="text" name="idname" />
+                     <br/>
+                     <input class="form-control "  placeholder="地址" type="text" name="address" />
+                     <br/>
+                     <input class="form-control "  placeholder="联系电话" type="text" name="phone" />
+                     <br/>
+                     <input class="form-control "  placeholder="邮箱" type="text" name="email" />
+
+
+
+
+    <br/><button type="submit" class="btn btn-success" id="submitbtn">
+    &nbsp;确定办理</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                     <a href="/returnbookstudent" class="btn btn-default " role="button">取消</a>
+
+</form>
+          </div>
+       </div>
+</div>
+</div>
+
+
+</body>
+</html>

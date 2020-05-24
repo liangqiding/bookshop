@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>图书管理系统</title>
+    <link rel="stylesheet" th:href="@{css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{css/bootstrap-theme.min.css}"/>
+    <script type="text/javascript" th:src="@{js/jquery-3.2.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{js/bootstrap.min.js}"></script>
+
+</head>
+<body background="../img/">
+<style>
+    .b {
+
+        margin: 150px;
+        border: 2px solid #ffc900;
+    }
+</style>
+<!-- ********************************************** 页眉标题 ***************************************************-->
+
+
+<div class="container-fluid">
+    <div class="row">
+        <h1 class="text-center">图书管理系统</h1>
+    </div>
+</div>
+<!--导航栏-->
+<div class="row">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <!-- 定义汉堡按钮 -->
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">首页</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+                    <li><a href="#">Link</a></li>
+                    <li><a href="#">Link</a></li>
+                    <li><a href="#">Link</a></li>
+                    <li><a href="#">Link</a></li>
+                    <li><a href="#">Link</a></li>
+
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+</div>
+
+
+
+<!--*********************************** 内容 *****************************************************-->
+<!-- .container 类用于固定宽度并支持响应式布局的容器。 -->
+
+
+<!-- 栅格系统用于通过一系列的行（row）与列（column）的组合来创建页面布局 -->
+
+<!-- 页面标题 -->
+
+
+<!--********************************************************  页脚底部  ***********************************************************-->
+<div class="container">
+    <div class="row company">
+        <hr>
+    </div>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>结算页面</title>
+
+    <link th:href="@{AmazeUI-2.4.2/assets/css/amazeui.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{basic/css/demo.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{css/cartstyle.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{css/jsstyle.css}" rel="stylesheet" type="text/css"/>
+    <link href="css/optstyle.css" rel="stylesheet" type="text/css"/>
+
+    <script type="text/javascript" th:src="@{js/address.js}"></script>
+    <script type="text/javascript" th:src="@{js/jquery-3.2.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{js/bootstrap.min.js}"></script>
+    <script type="text/javascript">
+
+
+function pay() {
+
+    //    crsf  token
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+    $(document).ajaxSend(function (e, xhr, options) {
+        xhr.setRequestHeader(header, token);
+    });
+    $.ajax({
+        type: 'post',
+        url: "/AjaxCartPay",
+        success: function (data) {
+            if (data == "结算成功") {
+             alert(data);
+                window.location.href="/personalorder";
+            }else if(data=="请先绑定完整地址信息，再结算"){
+                alert(data)
+                if(confirm("是否立即前往设置")){
+                    window.location.href="/address";
+                }
+            }else {
+                alert(data);
+            }
+        },
+        error: function () {
+            alert("出错了")
+
+        }
+    });
+}
+
+        function sums(id) {
+            sum = $(eval("sum" + id)).val();
+            if (sum <= 0) {
+                alert("请正确输入购买数量")
+                $(eval("sum" + id)).val(1);
+                return false;
+            }
+
+            addcart(sum, id)
+        }
+
+        function adds(id) {
+            price = $(eval("price" + id)).val();
+            sum = $(eval("sum" + id)).val();
+            sum++;
+            addcart(sum, id);
+        }
+
+        function subs(id) {
+            price = $(eval("price" + id)).val();
+            var sum = $(eval("sum" + id)).val();
+
+            if (sum <= 1) {
+                alert("购买数量不能再低了！");
+            }
+            sum--;
+            addcart(sum, id)
+        }
+
+        function addcart(sum, id, cart_state) {
+
+            //    crsf  token
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            $(document).ajaxSend(function (e, xhr, options) {
+                xhr.setRequestHeader(header, token);
+            });
+
+
+            $.ajax({
+                type: 'post',
+                url: "/AjaxCart",
+                dataType: "JSON",
+                data: {"sum": sum, "id": id, "cart_state": cart_state},
+                success: function (data) {
+                    if (data != null) {
+//                       sumprice单件总价
+                        var toFixed = data.cart_book_order_price.toFixed(2);
+                        $(eval("sumprice" + data.cart_id)).html(toFixed);
+//                单件购买总数
+                        $(eval("sum" + data.cart_id)).html(data.cart_sum);
+//                pricej九折
+                        pricej = data.cart_one_price * 0.9;
+                        pricej = pricej.toFixed(2);
+                        $(eval("pricej" + data.cart_id)).html(pricej);
+//				pricey原价
+
+                        pricey = data.cart_one_price;
+                        pricey = pricey.toFixed(2);
+                        $(eval("pricey" + data.cart_id)).html(pricey);
+//                结算总价
+                        sumprice = data.sumprice.toFixed(2);
+                        $("#sump").html(sumprice);
+                    }
+                },
+                error: function () {
+                    alert("出错了")
+
+                }
+            });
+
+
+        }
+
+        function check(id) {
+            if ($(eval("checkbox" + id)).is(":checked")) {
+                cart_state = "待结算";
+                addcartorder(id, cart_state);
+            }else {
+                cart_state = "购物车";
+                addcartorder(id, cart_state);
+            }
+        }
+
+        $(function () {
+            $("#J_SelectAllCbx2").click(function () {
+                if ($("#J_SelectAllCbx2").is(":checked")) {
+                    $('input[type="checkbox"]').prop("checked", true);
+                    cart_state = "待结算";
+                    all=1;
+                    id=0;
+                    addcartorder(id, cart_state,all);
+
+                } else {
+                    $('input[type="checkbox"]').prop("checked", false);
+                    cart_state = "购物车";
+                    all=0;
+                    id=0;
+                    addcartorder(id, cart_state,all);
+                }
+            })
+        })
+
+        function addcartorder(id, cart_state, all) {
+
+            //    crsf  token
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            $(document).ajaxSend(function (e, xhr, options) {
+                xhr.setRequestHeader(header, token);
+            });
+            if (all != null) {
+
+            }
+
+            $.ajax({
+                type: 'post',
+                url: "/AjaxCartOrder",
+                dataType: "JSON",
+                data: {"id": id, "cart_state": cart_state,"all":all},
+                success: function (data) {
+                    if (data != null) {
+//                结算总价
+                        sumprice = data.sumprice.toFixed(2);
+                        $("#sump").html(sumprice);
+                        $("#sumlist").html(data.cart_sum);
+                    }
+                },
+                error: function () {
+                    alert("出错了")
+
+                }
+            });
+        }
+
+
+    </script>
+
+</head>
+
+<body>
+
+<!--顶部导航条 -->
+<div class="am-container header">
+    <ul class="message-l">
+
+    </ul>
+    <ul class="message-r">
+        <div class="topMessage home">
+            <div class="menu-hd"><a href="/index" target="_top" class="h">商城首页</a></div>
+        </div>
+        <div class="topMessage my-shangcheng">
+            <div class="menu-hd MyShangcheng"><a href="#" target="_top"><i class="am-icon-user am-icon-fw"></i>个人中心</a>
+            </div>
+        </div>
+        <div class="topMessage mini-cart">
+            <div class="menu-hd"><a id="mc-menu-hd" href="#" target="_top"><i
+                    class="am-icon-shopping-cart  am-icon-fw"></i><span>购物车</span><strong id="J_MiniCartNum"
+                                                                                          class="h">0</strong></a></div>
+        </div>
+        <div class="topMessage favorite">
+            <div class="menu-hd"><a href="#" target="_top"><i class="am-icon-heart am-icon-fw"></i><span>收藏夹</span></a>
+            </div>
+    </ul>
+</div>
+
+<!--悬浮搜索框-->
+
+<div class="nav white">
+    <div class="logo"><img src="images/logo.png"/></div>
+    <div class="logoBig">
+        <li><img src="images/logobig.png"/></li>
+    </div>
+
+    <div class="search-bar pr">
+        <a name="index_none_header_sysc" href="#"></a>
+        <form>
+            <input id="searchInput" name="index_none_header_sysc" type="text" placeholder="搜索" autocomplete="off">
+            <input id="ai-topsearch" class="submit am-btn" value="搜索" index="1" type="submit">
+        </form>
+    </div>
+</div>
+
+<div class="clear"></div>
+
+<!--购物车 -->
+<div class="concent">
+    <div id="cartTable">
+        <div class="cart-table-th">
+            <div class="wp">
+
+                <div class="th th-item">
+                    <div class="td-inner">商品信息</div>
+                </div>
+                <div class="th th-price">
+                    <div class="td-inner">单价</div>
+                </div>
+                <div class="th th-amount">
+                    <div class="td-inner">数量</div>
+                </div>
+                <div class="th th-sum">
+                    <div class="td-inner">金额</div>
+                </div>
+                <div class="th th-op">
+                    <div class="td-inner">操作</div>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+
+        <tr class="item-list">
+            <div class="bundle  bundle-last ">
+                <div class="bundle-hd">
+                    <div class="bd-promos">
+                        <div class="bd-has-promo">已享优惠:<span class="bd-has-promo-content">全部商品九折</span>&nbsp;&nbsp;
+                        </div>
+
+                        <span class="list-change theme-login">编辑</span>
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div class="bundle-main">
+
+                    <ul class="item-content clearfix" th:each="cart:${cart}">
+                        <li class="td td-chk">
+                            <div class="cart-checkbox ">
+
+                                <div th:if="${cart.cart_state}=='待结算'">
+                                <input class="check" th:id="'checkbox'+${cart.id}" name="items[]" value="170037950254"
+                                       type="checkbox" th:onclick="'check('+${cart.id}+')'" checked="checked">
+
+                                </div>
+                                <div th:if="${cart.cart_state}=='购物车'">
+                                    <input class="check" th:id="'checkbox'+${cart.id}" name="items[]" value="170037950254"
+                                           type="checkbox" th:onclick="'check('+${cart.id}+')'" >
+
+                                </div>
+                                <!--<label for="J_CheckBox"></label>-->
+                            </div>
+                        </li>
+                        <li class="td td-item">
+                            <div class="item-pic">
+                                <a href="#" target="_blank" th:data-title="${cart.cart_book_name}" class="J_MakePoint"
+                                   data-point="tbcart.8.12">
+                                    <img th:src="'img/'+${cart.cart_imgfile}" class="itempic J_ItemImg"></a>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-basic-info">
+                                    <a href="#" target="_blank" th:text="${cart.cart_book_name}"
+                                       class="item-title J_MakePoint" data-point="tbcart.8.11"></a>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="td td-info">
+                            <div class="item-props item-props-can">
+
+                                <span class="sku-line">套餐：标准套餐</span>
+
+
+                            </div>
+                        </li>
+                        <li class="td td-price">
+                            <div class="item-price price-promo-promo">
+                                <div class="price-content">
+                                    <div class="price-line">
+                                        <em th:id="'pricey'+${cart.id}" class="price-original"
+                                            th:text="${#numbers.formatDecimal(cart.cart_one_price,1,2)}" value="6"></em>
+                                    </div>
+                                    <div class="price-line">
+                                        <em th:id="'pricej'+${cart.id}" class="J_Price price-now" tabindex="0"
+                                            th:text="${#numbers.formatDecimal(cart.cart_one_price*0.9,1,2)}"></em>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="td td-amount">
+                            <div class="amount-wrapper ">
+                                <div class="item-amount ">
+                                    <div class="sl">
+                                        <input th:id="'price'+${cart.id}" type="hidden"
+                                               th:value="${cart.cart_book_order_price}">
+                                        <input id="sub" class="min am-btn" name="" type="button" value="-"
+                                               th:onclick="'return subs('+${cart.id}+')'"/>
+                                        <input th:id="'sum'+${cart.id}" class="text_box" name="" type="text"
+                                               th:value="${cart.cart_sum}" style="width:30px;"
+                                               th:onblur="'sums('+${cart.id}+')'"/>
+                                        <input id="add" class="add am-btn" name="" type="button" value="+"
+                                               th:onclick="'adds('+${cart.id}+')'"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="td td-sum">
+                            <div class="td-inner">
+                                <em th:id="'sumprice'+${cart.id}" tabindex="0" class="J_ItemSum number"
+                                    th:text="${#numbers.formatDecimal(cart.cart_book_order_price,1,2)}"></em>
+                            </div>
+                        </li>
+                        <li class="td td-op">
+                            <div class="td-inner">
+
+
+                                <a href="javascript:;" data-point-url="#" class="delete"> 移出购物车
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+
+
+                </div>
+            </div>
+        </tr>
+        <div class="clear"></div>
+
+
+    </div>
+    <div class="clear"></div>
+
+    <div class="float-bar-wrapper">
+        <div id="J_SelectAll2" class="select-all J_SelectAll">
+            <div class="cart-checkbox">
+                <input class="check-all check" id="J_SelectAllCbx2" name="select-all" value="true" type="checkbox">
+                <label for="J_SelectAllCbx2"></label>
+            </div>
+            <span>全选</span>
+        </div>
+        <div class="operations">
+            <a href="#" hidefocus="true" class="deleteAll">删除</a>
+            <a href="#" hidefocus="true" class="J_BatchFav">移入收藏夹</a>
+        </div>
+        <div class="float-bar-right">
+            <div class="price-sum">
+                <span class="txt">已选商品</span>
+                <strong id="J_SelectedItemsCount" class="price"><em id="sumlist" th:text="${sump.cart_sum}">0</em></strong><span class="txt">件</span>
+                <div class="arrow-box">
+                    <span class="selected-items-arrow"></span>
+                    <span class="arrow"></span>
+                </div>
+            </div>
+            <div class="price-sum">
+                <span class="txt">合计:</span>
+                <strong id="sump" class="price">¥<em id="J_Total" th:text="${sump.sumprice}"></em></strong>
+            </div>
+            <div class="btn-area">
+                <a onclick="pay()" id="J_Go" class="submit-btn submit-btn-disabled" aria-label="请注意如果没有选择宝贝，将无法结算">
+                    <span>结&nbsp;算</span></a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <div class="footer-hd">
+            <p>
+
+                <a href="/index">商城首页</a>
+                <b>|</b>
+                <a href="#">支付宝</a>
+                <b>|</b>
+                <a href="#">物流</a>
+            </p>
+        </div>
+        <div class="footer-bd">
+            <p>
+
+                <a href="#">合作伙伴</a>
+                <a href="#">联系我们</a>
+                <a href="#">网站地图</a>
+                <em>© </em>
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<!--操作页面-->
+
+<div class="theme-popover-mask"></div>
+
+<div class="theme-popover">
+    <div class="theme-span"></div>
+    <div class="theme-poptit h-title">
+        <a href="javascript:;" title="关闭" class="close">×</a>
+    </div>
+    <div class="theme-popbod dform">
+        <form class="theme-signin" name="loginform" action="" method="post">
+
+            <div class="theme-signin-left">
+
+                <li class="theme-options">
+                    <div class="cart-title">颜色：</div>
+                    <ul>
+                        <li class="sku-line selected">12#川南玛瑙<i></i></li>
+                        <li class="sku-line">10#蜜橘色+17#樱花粉<i></i></li>
+                    </ul>
+                </li>
+                <li class="theme-options">
+                    <div class="cart-title">包装：</div>
+                    <ul>
+                        <li class="sku-line selected">包装：裸装<i></i></li>
+                        <li class="sku-line">两支手袋装（送彩带）<i></i></li>
+                    </ul>
+                </li>
+                <div class="theme-options">
+                    <div class="cart-title number">数量</div>
+                    <dd>
+                        <input class="min am-btn am-btn-default" name="" type="button" value="-"/>
+                        <input class="text_box" name="" type="text" value="1" style="width:30px;"/>
+                        <input class="add am-btn am-btn-default" name="" type="button" value="+"/>
+                        <span class="tb-hidden">库存<span class="stock">1000</span>件</span>
+                    </dd>
+
+                </div>
+                <div class="clear"></div>
+                <div class="btn-op">
+                    <div class="btn am-btn am-btn-warning">确认</div>
+                    <div class="btn close am-btn am-btn-warning">取消</div>
+                </div>
+
+            </div>
+            <div class="theme-signin-right">
+                <div class="img-info">
+                    <img src="images/kouhong.jpg_80x80.jpg"/>
+                </div>
+                <div class="text-info">
+                    <span class="J_Price price-now">¥39.00</span>
+                    <span id="Stock" class="tb-hidden">库存<span class="stock">1000</span>件</span>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+<!--引导 -->
+<div class="navCir">
+    <li><a href="home.html"><i class="am-icon-home "></i>首页</a></li>
+    <li><a href="sort.html"><i class="am-icon-list"></i>分类</a></li>
+    <li class="active"><a href="shopcart.html"><i class="am-icon-shopping-basket"></i>购物车</a></li>
+    <li><a href="person/index.html"><i class="am-icon-user"></i>我的</a></li>
+</div>
+</body>
+
+</html>

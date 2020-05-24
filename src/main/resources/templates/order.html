@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<head>
+	<meta charset="UTF-8"></meta>
+	<title>Spring Boot Web开发测试</title>
+	<link rel="stylesheet" th:href="@{css/bootstrap.min.css}"/>
+	<link rel="stylesheet" th:href="@{css/bootstrap-theme.min.css}"/>
+
+		<title>订单管理</title>
+
+		<link href="AmazeUI-2.4.2/assets/css/admin.css" rel="stylesheet" type="text/css">
+		<link href="AmazeUI-2.4.2/assets/css/amazeui.css" rel="stylesheet" type="text/css">
+
+		<link href="css/personal.css" rel="stylesheet" type="text/css">
+		<link href="css/orstyle.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" th:src="@{js/jquery-3.2.1.min.js}"></script>
+	<script type="text/javascript" th:src="@{js/bootstrap.min.js}"></script>
+
+		<script src="AmazeUI-2.4.2/assets/js/jquery.min.js"></script>
+		<script src="AmazeUI-2.4.2/assets/js/amazeui.js"></script>
+	<script>
+	function cancal(){
+	var r=confirm("确定取消吗？");
+	if(r==true)
+	{
+	//写入数据库中，对应ID扣掉5积分
+	alert("取消成功");//写上JS跳转信息，跳转到详细信息页面
+	}
+	else
+	{
+	alert("取消失败");
+	return false;
+	}
+	}
+	</script>
+	<style>
+		.am-btn-blue {
+			color: #fff;
+			background-color: #58ddd5;
+			border-color: #58ddd5;
+		}
+		.am-btn-green {
+			color: #fff;
+			background-color:#3cdd79;
+			border-color: #3cdd79;
+		}
+		.am-btn-yellow {
+			color: #fff;
+			background-color: #ddd71c;
+			border-color: #ddd71c;
+		}
+	</style>
+	</head>
+
+	<body>
+		<!--头 -->
+		<header>
+			<article>
+				<div class="mt-logo">
+					<!--顶部导航条 -->
+					<div class="am-container header">
+						<ul class="message-l">
+							<div class="topMessage">
+								<div class="menu-hd">
+								</div>
+							</div>
+						</ul>
+						<ul class="message-r">
+							<div class="topMessage home">
+								<div class="menu-hd"><a href="/book" target="_top" class="h">卖家中心</a></div>
+							</div>
+							<div class="topMessage favorite">
+						</div>
+						</ul>
+						<!--悬浮搜索框-->
+
+						<div class="nav white">
+							<div class="logoBig">
+								<li><img src="images/logobig.png" /></li>
+							</div>
+
+							<div class="search-bar pr">
+								<a name="index_none_header_sysc" href="#"></a>
+								<form>
+									<input id="searchInput" name="index_none_header_sysc" type="text" placeholder="搜索" autocomplete="off">
+									<input id="ai-topsearch" class="submit am-btn" value="搜索" index="1" type="submit">
+								</form>
+							</div>
+						</div>
+
+						<div class="clear"></div>
+					</div>
+				</div>
+			</article>
+		</header>
+            <div class="nav-table">
+					   <div class="long-title"><span class="all-goods">全部分类</span></div>
+					   <div class="nav-cont">
+							<ul>
+								<li class="index"><a href="/book">卖家中心</a></li>
+						    <div class="nav-extra">
+						    	<i class="am-icon-user-secret am-icon-md nav-user"></i><b></b>我的福利
+						    	<i class="am-icon-angle-right" style="padding-left: 10px;"></i>
+						    </div>
+						</div>
+			</div>
+			<b class="line"></b>
+		<div class="center">
+			<div class="col-main">
+				<div class="main-wrap">
+
+					<div class="user-order">
+
+						<!--标题 -->
+						<div class="am-cf am-padding">
+							<div class="am-fl am-cf"><strong class="am-text-danger am-text-lg">订单管理</strong> / <small>Order</small></div>
+						</div>
+						<hr/>
+
+						<div class="am-tabs am-tabs-d2 am-margin" data-am-tabs>
+
+							<ul class="am-avg-sm-5 am-tabs-nav am-nav am-nav-tabs">
+								<li class="am-active"><a href="#tab1">所有订单</a></li>
+								<li><a href="#tab2">待发货</a></li>
+								<li><a href="#tab3">待收货</a></li>
+								<li><a href="#tab4">交易成功</a></li>
+								<li><a href="#tab5">交易失败</a></li>
+							</ul>
+
+							<div class="am-tabs-bd">
+								<div class="am-tab-panel am-fade am-in am-active" id="tab1">
+									<div class="order-top">
+										<div class="th th-item">
+											<td class="td-inner">商品</td>
+										</div>
+										<div class="th th-price">
+											<td class="td-inner">单价</td>
+										</div>
+										<div class="th th-number">
+											<td class="td-inner">数量</td>
+										</div>
+										<div class="th th-operation">
+											<td class="td-inner">商品操作</td>
+										</div>
+										<div class="th th-amount">
+											<td class="td-inner">合计</td>
+										</div>
+										<div class="th th-status">
+											<td class="td-inner">交易状态</td>
+										</div>
+										<div class="th th-change">
+											<td class="td-inner">交易操作</td>
+										</div>
+									</div>
+
+
+									<div class="order-main">
+										<div class="order-list">
+											
+											<!--订单信息-->
+											<div class="order-status5" th:each="order:${order}">
+
+
+												<div class="order-title">
+													<div class="dd-num">订单编号：<a href="javascript:;" th:text="${order.order_id}"></a></div>
+													<span th:text="'成交时间：'+${order.date}"></span>
+													<!--    <em>店铺：小桔灯</em>-->
+												</div>
+
+												<div class="order-content">
+													<div class="order-left">
+
+														<ul class="item-list" th:each="cart:${order.CartList}">
+															<li class="td td-item">
+																<div class="item-pic">
+																	<a href="#" class="J_MakePoint">
+																		<img th:src="'img/'+${cart.cart_imgfile}" class="itempic J_ItemImg">
+																	</a>
+																</div>
+																<div class="item-info">
+																	<div class="item-basic-info">
+																		<a href="#">
+																			<p th:text="${cart.cart_book_name}"></p>
+																			<p class="info-little">套餐：套餐一
+
+																		</a>
+																	</div>
+																</div>
+															</li>
+															<li class="td td-price">
+																<div class="item-price" th:text="${cart.cart_one_price}">
+
+																</div>
+															</li>
+															<li class="td td-number">
+																<div class="item-number">
+																	<span th:text="'×'+${cart.cart_sum}"></span>
+																</div>
+															</li>
+															<li class="td td-operation">
+																<div class="item-operation">
+																	<div th:if="${order.state}=='交易失败'">
+																		<a>已关闭交易</a>
+																	</div>
+																	<div th:if="${order.state}!='交易失败'">
+																		<a  th:href="'/updatewuliu?cancal='+${order.order_id}" onclick="return cancal()">取消订单</a>
+																	</div>
+																</div>
+															</li>
+														</ul>
+
+
+													</div>
+
+													<div class="order-right">
+														<li class="td td-amount">
+															<div class="item-amount" th:text="'合计：'+${order.order_price}">
+
+																<p>含运费：<span>10.00</span></p>
+															</div>
+														</li>
+														<div class="move-right">
+															<li class="td td-status">
+																<div class="item-status">
+																	<p class="Mystatus" th:text="${order.state}"></p>
+																	<p class="order-info"><a href="#">订单详情</a></p>
+																</div>
+															</li>
+															<li class="td td-change">
+																<div th:if="${order.state}=='待发货'">
+																<div class="am-btn am-btn-blue anniu" data-toggle="modal" th:data-target="'#myModal'+${order.order_id}">
+																	发货</div>
+																</div>
+																<div th:if="${order.state}=='待收货'">
+																	<div class="am-btn am-btn-yellow anniu" data-toggle="modal">
+																		提醒收货</div>
+																</div>
+																<div th:if="${order.state}=='交易失败'">
+																	<div class="am-btn am-btn-danger anniu" data-toggle="modal">
+																		交易关闭</div>
+																</div>
+																<div th:if="${order.state}=='交易成功'">
+																	<div class="am-btn am-btn-green anniu" data-toggle="modal">
+																		交易成功</div>
+																</div>
+															</li>
+														</div>
+													</div>
+												</div>
+											</div>
+
+
+
+										</div>
+
+									</div>
+
+								</div>
+
+								<div class="am-tab-panel am-fade" id="tab2">
+
+									<div class="order-top">
+										<div class="th th-item">
+											<td class="td-inner">商品</td>
+										</div>
+										<div class="th th-price">
+											<td class="td-inner">单价</td>
+										</div>
+										<div class="th th-number">
+											<td class="td-inner">数量</td>
+										</div>
+										<div class="th th-operation">
+											<td class="td-inner">商品操作</td>
+										</div>
+										<div class="th th-amount">
+											<td class="td-inner">合计</td>
+										</div>
+										<div class="th th-status">
+											<td class="td-inner">交易状态</td>
+										</div>
+										<div class="th th-change">
+											<td class="td-inner">交易操作</td>
+										</div>
+									</div>
+
+									<div class="order-main">
+										<div class="order-list">
+
+											<!--订单信息 待发货-->
+											<div class="order-status5" th:each="order1:${order1}">
+
+
+												<div class="order-title">
+													<div class="dd-num">订单编号：<a href="javascript:;" th:text="${order1.order_id}"></a></div>
+													<span th:text="'成交时间：'+${order1.date}"></span>
+													<!--    <em>店铺：小桔灯</em>-->
+												</div>
+
+												<div class="order-content">
+													<div class="order-left">
+
+														<ul class="item-list" th:each="cart1:${order1.CartList}">
+															<li class="td td-item">
+																<div class="item-pic">
+																	<a href="#" class="J_MakePoint">
+																		<img th:src="'img/'+${cart1.cart_imgfile}" class="itempic J_ItemImg">
+																	</a>
+																</div>
+																<div class="item-info">
+																	<div class="item-basic-info">
+																		<a href="#">
+																			<p th:text="${cart1.cart_book_name}"></p>
+																			<p class="info-little">套餐：套餐一
+
+																		</a>
+																	</div>
+																</div>
+															</li>
+															<li class="td td-price">
+																<div class="item-price" th:text="${cart1.cart_one_price}">
+
+																</div>
+															</li>
+															<li class="td td-number">
+																<div class="item-number">
+																	<span th:text="'×'+${cart1.cart_sum}"></span>
+																</div>
+															</li>
+															<li class="td td-operation">
+																<div class="item-operation">
+																	<div th:if="${order1.state}=='交易失败'">
+																		<a>已关闭交易</a>
+																	</div>
+																	<div th:if="${order1.state}!='交易失败'">
+																		<a  th:href="'/updatewuliu?cancal='+${order1.order_id}" onclick="return cancal()">取消订单</a>
+																	</div>
+																</div>
+															</li>
+														</ul>
+
+
+													</div>order_
+
+													<div class="order-right">
+														<li class="td td-amount">
+															<div class="item-amount" th:text="'合计：'+${order1.order_price}">
+
+																<p>含运费：<span>10.00</span></p>
+															</div>
+														</li>
+														<div class="move-right">
+															<li class="td td-status">
+																<div class="item-status">
+																	<p class="Mystatus" th:text="${order1.state}"></p>
+																	<p class="order-info"><a href="#">订单详情</a></p>
+																</div>
+															</li>
+															<li class="td td-change">
+																<div th:if="${order1.state}=='待发货'">
+																	<div class="am-btn am-btn-blue anniu" data-toggle="modal" th:data-target="'#myModal'+${order1.order_id}">
+																		发货</div>
+																</div>
+																<div th:if="${order1.state}=='待收货'">
+																	<div class="am-btn am-btn-yellow anniu" data-toggle="modal">
+																		提醒收货</div>
+																</div>
+																<div th:if="${order1.state}=='交易失败'">
+																	<div class="am-btn am-btn-danger anniu" data-toggle="modal">
+																		交易关闭</div>
+																</div>
+																<div th:if="${order1.state}=='交易成功'">
+																	<div class="am-btn am-btn-green anniu" data-toggle="modal">
+																		交易成功</div>
+																</div>
+															</li>
+														</div>
+													</div>
+												</div>
+											</div>
+
+
+										</div>
+
+									</div>
+								</div>
+
+								<div class="am-tab-panel am-fade" id="tab3">
+									<div class="order-top">
+										<div class="th th-item">
+											<td class="td-inner">商品</td>
+										</div>
+										<div class="th th-price">
+											<td class="td-inner">单价</td>
+										</div>
+										<div class="th th-number">
+											<td class="td-inner">数量</td>
+										</div>
+										<div class="th th-operation">
+											<td class="td-inner">商品操作</td>
+										</div>
+										<div class="th th-amount">
+											<td class="td-inner">合计</td>
+										</div>
+										<div class="th th-status">
+											<td class="td-inner">交易状态</td>
+										</div>
+										<div class="th th-change">
+											<td class="td-inner">交易操作</td>
+										</div>
+									</div>
+
+									<div class="order-main">
+										<div class="order-list">
+
+											<!--订单信息 待发货-->
+											<div class="order-status5" th:each="order2:${order2}">
+
+
+												<div class="order-title">
+													<div class="dd-num">订单编号：<a href="javascript:;" th:text="${order2.order_id}"></a></div>
+													<span th:text="'成交时间：'+${order2.date}"></span>
+													<!--    <em>店铺：小桔灯</em>-->
+												</div>
+
+												<div class="order-content">
+													<div class="order-left">
+
+														<ul class="item-list" th:each="cart2:${order2.CartList}">
+															<li class="td td-item">
+																<div class="item-pic">
+																	<a href="#" class="J_MakePoint">
+																		<img th:src="'img/'+${cart2.cart_imgfile}" class="itempic J_ItemImg">
+																	</a>
+																</div>
+																<div class="item-info">
+																	<div class="item-basic-info">
+																		<a href="#">
+																			<p th:text="${cart2.cart_book_name}"></p>
+																			<p class="info-little">套餐：套餐一
+
+																		</a>
+																	</div>
+																</div>
+															</li>
+															<li class="td td-price">
+																<div class="item-price" th:text="${cart2.cart_one_price}">
+
+																</div>
+															</li>
+															<li class="td td-number">
+																<div class="item-number">
+																	<span th:text="'×'+${cart2.cart_sum}"></span>
+																</div>
+															</li>
+															<li class="td td-operation">
+																<div class="item-operation">
+																	<div th:if="${order2.state}=='交易失败'">
+																		<a>已关闭交易</a>
+																	</div>
+																	<div th:if="${order2.state}!='交易失败'">
+																		<a  th:href="'/updatewuliu?cancal='+${order2.order_id}" onclick="return cancal()">取消订单</a>
+																	</div>
+																</div>
+															</li>
+														</ul>
+
+
+													</div>
+
+													<div class="order-right">
+														<li class="td td-amount">
+															<div class="item-amount" th:text="'合计：'+${order2.order_price}">
+
+																<p>含运费：<span>10.00</span></p>
+															</div>
+														</li>
+														<div class="move-right">
+															<li class="td td-status">
+																<div class="item-status">
+																	<p class="Mystatus" th:text="${order2.state}"></p>
+																	<p class="order-info"><a href="#">订单详情</a></p>
+																</div>
+															</li>
+															<li class="td td-change">
+																<div th:if="${order2.state}=='待发货'">
+																	<div class="am-btn am-btn-blue anniu" data-toggle="modal" th:data-target="'#myModal'+${order2.order_id}">
+																		发货</div>
+																</div>
+																<div th:if="${order2.state}=='待收货'">
+																	<div class="am-btn am-btn-yellow anniu" data-toggle="modal">
+																		提醒收货</div>
+																</div>
+																<div th:if="${order2.state}=='交易失败'">
+																	<div class="am-btn am-btn-danger anniu" data-toggle="modal">
+																		交易关闭</div>
+																</div>
+																<div th:if="${order2.state}=='交易成功'">
+																	<div class="am-btn am-btn-green anniu" data-toggle="modal">
+																		交易成功</div>
+																</div>
+															</li>
+														</div>
+													</div>
+												</div>
+											</div>
+
+
+										</div>
+									</div>
+								</div>
+
+								<div class="am-tab-panel am-fade" id="tab4">
+									<div class="order-top">
+										<div class="th th-item">
+											<td class="td-inner">商品</td>
+										</div>
+										<div class="th th-price">
+											<td class="td-inner">单价</td>
+										</div>
+										<div class="th th-number">
+											<td class="td-inner">数量</td>
+										</div>
+										<div class="th th-operation">
+											<td class="td-inner">商品操作</td>
+										</div>
+										<div class="th th-amount">
+											<td class="td-inner">合计</td>
+										</div>
+										<div class="th th-status">
+											<td class="td-inner">交易状态</td>
+										</div>
+										<div class="th th-change">
+											<td class="td-inner">交易操作</td>
+										</div>
+									</div>
+
+									<div class="order-main">
+										<div class="order-list">
+											<!--订单信息 交易成功-->
+											<div class="order-status5" th:each="order3:${order3}">
+
+
+												<div class="order-title">
+													<div class="dd-num">订单编号：<a href="javascript:;" th:text="${order3.order_id}"></a></div>
+													<span th:text="'成交时间：'+${order3.date}"></span>
+													<!--    <em>店铺：小桔灯</em>-->
+												</div>
+
+												<div class="order-content">
+													<div class="order-left">
+
+														<ul class="item-list" th:each="cart3:${order3.CartList}">
+															<li class="td td-item">
+																<div class="item-pic">
+																	<a href="#" class="J_MakePoint">
+																		<img th:src="'img/'+${cart3.cart_imgfile}" class="itempic J_ItemImg">
+																	</a>
+																</div>
+																<div class="item-info">
+																	<div class="item-basic-info">
+																		<a href="#">
+																			<p th:text="${cart3.cart_book_name}"></p>
+																			<p class="info-little">套餐：套餐一
+
+																		</a>
+																	</div>
+																</div>
+															</li>
+															<li class="td td-price">
+																<div class="item-price" th:text="${cart3.cart_one_price}">
+
+																</div>
+															</li>
+															<li class="td td-number">
+																<div class="item-number">
+																	<span th:text="'×'+${cart3.cart_sum}"></span>
+																</div>
+															</li>
+															<li class="td td-operation">
+																<div class="item-operation">
+																	<div th:if="${order3.state}=='交易失败'">
+																		<a>已关闭交易</a>
+																	</div>
+																	<div th:if="${order3.state}!='交易失败'">
+																		<a  th:href="'/updatewuliu?cancal='+${order3.order_id}" onclick="return cancal()">取消订单</a>
+																	</div>
+																</div>
+															</li>
+														</ul>
+
+
+													</div>
+
+													<div class="order-right">
+														<li class="td td-amount">
+															<div class="item-amount" th:text="'合计：'+${order3.order_price}">
+
+																<p>含运费：<span>10.00</span></p>
+															</div>
+														</li>
+														<div class="move-right">
+															<li class="td td-status">
+																<div class="item-status">
+																	<p class="Mystatus" th:text="${order3.state}"></p>
+																	<p class="order-info"><a href="#">订单详情</a></p>
+																</div>
+															</li>
+															<li class="td td-change">
+																<div th:if="${order3.state}=='待发货'">
+																	<div class="am-btn am-btn-blue anniu" data-toggle="modal" th:data-target="'#myModal'+${order3.order_id}">
+																		发货</div>
+																</div>
+																<div th:if="${order3.state}=='待收货'">
+																	<div class="am-btn am-btn-yellow anniu" data-toggle="modal">
+																		提醒收货</div>
+																</div>
+																<div th:if="${order3.state}=='交易失败'">
+																	<div class="am-btn am-btn-danger anniu" data-toggle="modal">
+																		交易关闭</div>
+																</div>
+																<div th:if="${order3.state}=='交易成功'">
+																	<div class="am-btn am-btn-green anniu" data-toggle="modal">
+																		交易成功</div>
+																</div>
+															</li>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="am-tab-panel am-fade" id="tab5">
+									<div class="order-top">
+										<div class="th th-item">
+											<td class="td-inner">商品</td>
+										</div>
+										<div class="th th-price">
+											<td class="td-inner">单价</td>
+										</div>
+										<div class="th th-number">
+											<td class="td-inner">数量</td>
+										</div>
+										<div class="th th-operation">
+											<td class="td-inner">商品操作</td>
+										</div>
+										<div class="th th-amount">
+											<td class="td-inner">合计</td>
+										</div>
+										<div class="th th-status">
+											<td class="td-inner">交易状态</td>
+										</div>
+										<div class="th th-change">
+											<td class="td-inner">交易操作</td>
+										</div>
+									</div>
+
+									<div class="order-main">
+										<div class="order-list">
+
+											<!--订单信息 交易失败-->
+											<div class="order-status5" th:each="order4:${order4}">
+
+
+												<div class="order-title">
+													<div class="dd-num">订单编号：<a href="javascript:;" th:text="${order4.order_id}"></a></div>
+													<span th:text="'成交时间：'+${order4.date}"></span>
+													<!--    <em>店铺：小桔灯</em>-->
+												</div>
+
+												<div class="order-content">
+													<div class="order-left">
+
+														<ul class="item-list" th:each="cart4:${order4.CartList}">
+															<li class="td td-item">
+																<div class="item-pic">
+																	<a href="#" class="J_MakePoint">
+																		<img th:src="'img/'+${cart4.cart_imgfile}" class="itempic J_ItemImg">
+																	</a>
+																</div>
+																<div class="item-info">
+																	<div class="item-basic-info">
+																		<a href="#">
+																			<p th:text="${cart4.cart_book_name}"></p>
+																			<p class="info-little">套餐：套餐一
+
+																		</a>
+																	</div>
+																</div>
+															</li>
+															<li class="td td-price">
+																<div class="item-price" th:text="${cart4.cart_one_price}">
+
+																</div>
+															</li>
+															<li class="td td-number">
+																<div class="item-number">
+																	<span th:text="'×'+${cart4.cart_sum}"></span>
+																</div>
+															</li>
+															<li class="td td-operation">
+																<div class="item-operation">
+																	<div th:if="${order4.state}=='交易失败'">
+																		<a>已关闭交易</a>
+																	</div>
+																	<div th:if="${order4.state}!='交易失败'">
+																		<a  th:href="'/updatewuliu?cancal='+${order4.order_id}" onclick="return cancal()">取消订单</a>
+																	</div>
+																</div>
+															</li>
+														</ul>
+
+
+													</div>
+
+													<div class="order-right">
+														<li class="td td-amount">
+															<div class="item-amount" th:text="'合计：'+${order4.order_price}">
+
+																<p>含运费：<span>10.00</span></p>
+															</div>
+														</li>
+														<div class="move-right">
+															<li class="td td-status">
+																<div class="item-status">
+																	<p class="Mystatus" th:text="${order4.state}"></p>
+																	<p class="order-info"><a href="#">订单详情</a></p>
+																</div>
+															</li>
+															<li class="td td-change">
+																<div th:if="${order4.state}=='待发货'">
+																	<div class="am-btn am-btn-blue anniu" data-toggle="modal" th:data-target="'#myModal'+${order4.order_id}">
+																		发货</div>
+																</div>
+																<div th:if="${order4.state}=='待收货'">
+																	<div class="am-btn am-btn-yellow anniu" data-toggle="modal">
+																		提醒收货</div>
+																</div>
+																<div th:if="${order4.state}=='交易失败'">
+																	<div class="am-btn am-btn-danger anniu" data-toggle="modal">
+																		交易关闭</div>
+																</div>
+																<div th:if="${order4.state}=='交易成功'">
+																	<div class="am-btn am-btn-green anniu" data-toggle="modal">
+																		交易成功</div>
+																</div>
+															</li>
+														</div>
+													</div>
+												</div>
+											</div>
+
+
+
+										</div>
+
+									</div>
+
+								</div>
+
+
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+				<!-- 添加Modal -->
+				<div th:each="orders:${order}">
+				<div class="modal fade" th:id="'myModal'+${orders.order_id}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								<h4 class="modal-title" id="myModalLabel">发货</h4>
+							</div>
+							<div class="modal-body">
+								<form  th:action="@{/updatewuliu}" enctype="multipart/form-data" method="post" id="update">
+
+                                          <input type="hidden" name="log_orderid" th:value="${orders.order_id}" id="log_orderid">
+									<input class="form-control" placeholder="物流单号" type="text" name="log_id" id="log_id"/>
+
+
+									<br/>物流种类：<br/>
+									<br/>
+									<select name="log_name" class="btn btn-default dropdown-toggle">
+										<option value="顺丰快递">顺丰快递</option>
+										<option value="天天快递">天天快递</option>
+										<option value="圆通快递">圆通快递</option>
+										<option value="中通快递">中通快递</option>
+									</select>
+									<br>
+									<br>
+									<br/><button type="submit" class="btn btn-success" id="submitbtns" >
+									&nbsp;发货</button>
+
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary" >检测</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				</div>
+
+				<!--底部-->
+				<div class="footer">
+					<div class="footer-hd">
+						<p>
+							<a href="/book">卖家中心</a>
+							<b>|</b>
+							<a href="#">支付宝</a>
+							<b>|</b>
+							<a href="#">物流</a>
+						</p>
+					</div>
+					<div class="footer-bd">
+						<p>
+							<a href="#">合作伙伴</a>
+							<a href="#">联系我们</a>
+							<a href="#">网站地图</a>
+							<em>©</em>
+						</p>
+					</div>
+
+				</div>
+			</div>
+			<aside class="menu">
+				<ul>
+					<li class="person">
+						<a href="index.html">个人中心</a>
+					</li>
+					<li class="person">
+						<a href="#">个人资料</a>
+						<ul>
+							<li> <a href="/personal">个人信息</a></li>
+							<li> <a href="/personal">安全设置</a></li>
+						</ul>
+					</li>
+
+
+
+
+
+				</ul>
+
+			</aside>
+		</div>
+
+	</body>
+
+</html>

@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--指定属性-->
+
+<mapper namespace="com.shop.dao.UserMapper">
+
+
+<select id="SelectDict" resultType="dict" parameterType="Integer">
+    SELECT
+    *
+    FROM
+    dict
+    WHERE dict_id=#{class_id}
+</select>
+
+    <!-- </select>查询所有用户详细信息 -->
+    <select id="SelectCardPageInfo" resultType="card" parameterType="Integer">
+SELECT
+card.id,
+card.`name`,
+card.sex,
+card.address,
+card.phone,
+card.email,
+card.age,
+card.card_id,
+card.card_date,
+credit,
+sum
+
+FROM
+card
+WHERE
+card_id=#{card_id}
+    </select>
+
+    <!-- </select>分页查询 -->
+    <select id="SelectAll" resultType="book" parameterType="book">
+        SELECT
+book.bookid,
+book.name,
+book.price,
+book.keep,
+book.zuozhe,
+book.imgfile,
+book.book_class,
+book.ISBM,
+book.state,
+dict_class,
+        book_out
+FROM book
+LEFT JOIN  dict
+on class_id=book_class
+        <where>
+<if test="book_class!='' and book_class!=null ">
+     book_class=#{book_class}
+</if>
+        <if test="name != null and name !=''" >
+            AND  name like "%"#{name}"%"
+        </if>
+        </where>
+   </select>
+    <!--添加图书-->
+    <insert id="Insertbook" parameterType="book">
+        insert into book(
+        book.name,
+        book.price,
+        book.keep,
+        book.zuozhe,
+        book.imgfile,
+        book_class,
+        state,
+        book_out
+
+        )
+        values(
+         #{name},
+        #{price},
+        #{keep},
+        #{zuozhe},
+        #{imgfile},
+        #{book_class},
+        #{state},
+        0
+
+        )
+    </insert>
+
+    <!--删除图书-->
+    <delete id="DeleteBook" parameterType="Integer">
+    DELETE FROM book
+    WHERE bookid=#{bookid};
+    </delete>
+    
+    <!--模糊查询-->
+    <select id="SelectBook" parameterType="book" resultType="book">
+        SELECT * FROM book
+        LEFT JOIN  dict
+        on class_id=book_class
+
+        <if test="name != null and name !=''" >
+            WHERE  name like "%"#{name}"%"
+        </if>
+    </select>
+
+    <!--更新-->
+    <update id="UpdateBook" parameterType="book">
+        update book
+        <set>
+        <if test="name!= null and name!=''" >
+            name=#{name},
+        </if>
+            <if test="zuozhe!= null and zuozhe!=''">
+                zuozhe=#{zuozhe},
+            </if>
+        <if test="price!= null and price!=''">
+            price=#{price},
+        </if>
+        <if test="keep!= null ">
+            keep=#{keep},
+        </if>
+
+        <if test="imgfile!= null and imgfile!=''" >
+            imgfile=#{imgfile},
+        </if>
+            <if test="book_out!= null and book_out!=''">
+                book_out=#{book_out},
+            </if>
+            <if test="state!= null and state!=''">
+                state=#{state},
+            </if>
+            <if test="book_class!= null and book_class!=''">
+                book_class=#{book_class},
+            </if>
+
+        </set>
+        where bookid=#{bookid}
+    </update>
+
+    <!--根据Id查询图书-->
+    <select id="SelectBookById" parameterType="Integer" resultType="book">
+        SELECT * FROM book
+        WHERE bookid=#{bookid}
+    </select>
+
+    <!-- #{date},-->
+    <!--办理借阅证-->
+    <insert id="CardInsert" parameterType="card">
+        INSERT into card(
+
+card.`name`,
+card.sex,
+card.address,
+card.phone,
+card.email,
+card.age,
+card.card_id,
+card_date,
+idname,
+credit,
+sum
+)
+VALUES
+(
+#{name},
+#{sex},
+#{address},
+#{phone},
+#{email},
+#{age},
+#{card_id},
+#{card_date},
+#{idname},
+'良好',
+0
+)
+    </insert>
+
+    <!--sucurity测试-->
+    <select id="SecurityselectFKUser" resultType="fKUser">
+        select * from tb_user where loginName = #{loginName}
+    </select>
+    <!--sucurity测试 查权限-->
+<select id="SelectRole" resultType="fKRole" parameterType="Integer">
+     SELECT id,authority FROM
+ tb_role
+WHERE
+id =#{role_id}
+</select>
+
+    <!--注册-->
+    <insert id="InsertFKUser" parameterType="fKUser">
+        INSERT INTO tb_user(
+
+tb_user.loginName,
+tb_user.username,
+tb_user.`password`,
+role_id
+)
+VALUES
+(
+#{loginName},
+#{username},
+#{password},
+3
+)
+    </insert>
+    <!--查询用户表-->
+    <select id="SelectFKUser" parameterType="fKUser" resultType="fKUser">
+        SELECT
+        *
+FROM
+tb_user
+<where>
+    loginName=#{loginName}
+
+</where>
+
+    </select>
+    <!--查询用户表-->
+    <select id="SelectFKUserByUserName" parameterType="fKUser" resultType="fKUser">
+        SELECT
+        *
+        FROM
+        tb_user
+        <where>
+ and username=#{username}
+    </where>
+
+    </select>
+    <!--查询所有book_keep-->
+    <select id="SelectAllBook_keep" resultType="book_keep">
+        SELECT * FROM
+        book_keep
+
+   </select>
+
+    <!--查询所有card-->
+    <select id="SelectAllCard" resultType="book_keep">
+        SELECT * FROM
+        card
+
+    </select>
+    <!--根据借阅卡号查询card-->
+    <select id="SelectCardByCID" resultType="card">
+        SELECT * FROM
+        card
+        WHERE
+        card_id=#{card_id}
+
+    </select>
+
+    <!--更新fkuser-->
+    <update id="UpdateFKUser" parameterType="fKUser">
+        update tb_user
+        <set>
+            <if test="user_cardid!= null">
+                user_cardid=#{user_cardid},
+            </if>
+
+        </set>
+        where username=#{username}
+    </update>
+
+    <!--更新Card-->
+    <update id="UpdateCard" parameterType="card">
+        update card
+        <set>
+            <if test="sum!= null">
+                sum=#{sum},
+            </if>
+            <if test="address!= null and address!=''">
+                address=#{address},
+            </if>
+            <if test="email!= null and email!=''">
+                email=#{email},
+            </if>
+            <if test="name!= null and name!=''">
+                name=#{name},
+            </if>
+            <if test="phone!= null and phone!=''">
+                phone=#{phone},
+            </if>
+        </set>
+        where card_id=#{card_id}
+    </update>
+
+<select id="SelectUserAllManagePageInfo" resultType="card">
+     SELECT
+    card.id,
+    card.`name`,
+    card.sex,
+    card.address,
+    card.phone,
+    card.email,
+    card.age,
+    card.card_id,
+    card.card_date,
+    credit,
+    sum,
+    tb_role.authority
+
+    FROM
+    card JOIN tb_role JOIN tb_user
+    ON card.card_id=tb_user.user_cardid AND tb_user.role_id=tb_role.id
+</select>
+
+
+
+
+
+</mapper>
+
